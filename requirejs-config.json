@@ -1,0 +1,5 @@
+{
+	"paths": {
+		"shelljs": "node/node_modules/shelljs/shell.js"
+	}
+}
