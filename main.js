@@ -11,49 +11,57 @@ define(function(require, exports, module){
 	var KeyBindingManager	= brackets.getModule("command/KeyBindingManager");
 	
 	
-	//load basicjdk NodeDomain
+	//load basicjdk NodeDomain that contains all our backend functions (everything that needs shell access basically)
 	var basicjdk = new NodeDomain("basicjdk", ExtensionUtils.getModulePath(module, "node/basicjdk"));
 	
-	
-	function determineJavaProjectPath(){
-		//Brackets' project root
-		var root			= ProjectManager.getProjectRoot();
-		var rootPath		= root.fullPath;
-		
-		//to contain a file object, can be an actual file or a directory
-		var file;
-		
-		//we first check if there is a file being currently view
-		//it's a safe bet that this file belongs to the java project the user is working on
-		file				= MainViewManager.getCurrentlyViewedFile();
-		
-		//if there is no file being currently viewed, we'll find the currently selected file instead
-		if(file == null)
-			file			= ProjectManager.getSelectedItem();
-		
-		//if there is neither an open file nor a selected one, we'll refuse to go on. (silently for the moment)
-		if(file == null)
-			return false;
-		
-		var filePath		= file.fullPath;
-		var parentDirPath	= FileUtils.getDirectoryPath(filePath);
-		
-		//if the directory that contains the file is the root directory
-		//then the root directory is our java project path
-		if(parentDirPath == rootPath)
-			return rootPath;
-		
-		
-		
+	/**
+	 * Calls basicjdk's compileFiles function on the Nodejs end.
+	 * @author Adel Wehbi
+	 * @param   {array}  filePaths  An array containing the paths of the files to be compiled.
+	 * @param   {string} outputPath The path of the directory in which the compiled file should be placed.
+	 * @returns {object} An object containing the process exit code, stdout, and stderr of the compile command.
+	 */
+	function compileFiles(filePath, outputPath){
+		return basicjdk.exec(
+			"compileFile",
+			filePath,
+			outputPath
+		);
 	}
+	
+	/**
+	 * Calls basicjdk's run function on the Nodejs end.
+	 * @author Adel Wehbi
+	 * @param {string} filePath The path of the .class file to run.
+	 */
+	function run(filePath){
+		var directory		= FileUtils.getDirectoryPath(filePath);
+		var className		= FileUtils.getFilenameWithoutExtension(FileUtils.getBaseName(filePath));
+		
+		basicjdk.exec(
+			"run",
+			directory,
+			className
+		);
+	}
+	
+	//listen to any output whether from compilation or from running
+	basicjdk.on("output", function(event, text){
+		console.log(text);
+	});
+	
+	//same but for errors
+	basicjdk.on("error", function(event, text){
+		console.error(text);
+	});
+	
+	
 	
 	var command				= CommandManager.register(
 		'command',
 		'basicjdk.command',
 		function(){
-			console.log(MainViewManager.getCurrentlyViewedFile().fullPath);
-			var dir = ProjectManager.getProjectRoot();
-			console.log(dir.fullPath);
+			run("/home/admin/.config/Brackets/extensions/user/brackets-basic-jdk/test.class");
 		}
 	);
 	
