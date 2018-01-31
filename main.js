@@ -6,8 +6,11 @@ define(function(require, exports, module){
 	var ExtensionUtils 		= brackets.getModule("utils/ExtensionUtils");
     var MainViewManager 	= brackets.getModule("view/MainViewManager");
 	var ProjectManager		= brackets.getModule("project/ProjectManager");
+	var FileSystem			= brackets.getModule("filesystem/FileSystem");
 	var FileUtils			= brackets.getModule("file/FileUtils");
+	var FindInFiles			= brackets.getModule("search/FindInFiles");
 	var CommandManager		= brackets.getModule("command/CommandManager");
+	var Menus				= brackets.getModule("command/Menus");
 	var KeyBindingManager	= brackets.getModule("command/KeyBindingManager");
 	
 	
@@ -21,12 +24,27 @@ define(function(require, exports, module){
 	 * @param   {string} outputPath The path of the directory in which the compiled file should be placed.
 	 * @returns {object} An object containing the process exit code, stdout, and stderr of the compile command.
 	 */
-	function compileFiles(filePath, outputPath){
+	function compileFiles(filePaths, outputPath){
 		return basicjdk.exec(
-			"compileFile",
-			filePath,
+			"compileFiles",
+			filePaths,
 			outputPath
 		);
+	}
+	
+	/**
+	 * Compiles all java files under projectPath into the outputPath.
+	 * @author Adel Wehbi
+	 * @param   {string} projectPath Path to java project.
+	 * @param   {string} outputPath  The output path for the compiled files RELATIVE TO PROJECT PATH
+	 * @returns {object} Object containing process exit code, stdout, and stderr.
+	 */
+	function compileProject(projectPath, outputPath){
+		
+		var filesToCompile		=	findJavaFilesUnderPath(projectPath);
+		
+		//TODO change projectPath
+		return compileFiles(filesToCompile, projectPath + outputPath);
 	}
 	
 	/**
@@ -35,7 +53,10 @@ define(function(require, exports, module){
 	 * @param {string} filePath The path of the .class file to run.
 	 */
 	function run(filePath){
+		//the directory in which the class to execute resides
 		var directory		= FileUtils.getDirectoryPath(filePath);
+		//getBaseName removes preceding path, and then getFilenameWithoutExtension removes the extension,
+		//so we're left with the class name only
 		var className		= FileUtils.getFilenameWithoutExtension(FileUtils.getBaseName(filePath));
 		
 		basicjdk.exec(
@@ -45,7 +66,110 @@ define(function(require, exports, module){
 		);
 	}
 	
-	//listen to any output whether from compilation or from running
+	
+	/**
+	 * Finds the Java project path based on the currently viewed file.
+	 * The project is considered to be the directory lying on Brackets that contains (no matter how deep) the file.
+	 * @author Adel Wehbi
+	 * @returns {string} The path of the Java project.
+	 */
+	function findProjectPath(){
+		var bracketsRoot	= ProjectManager.getProjectRoot().fullPath;
+		
+		//first we check the currently viewed file
+		var file			= MainViewManager.getCurrentlyViewedFile();
+		//if there is an open file and if it is in the Brackets file tree
+		if(file != null && ProjectManager.isWithinProject(file.fullPath)){
+			//if the file is actually inside a java project and not just hanging on root
+			if(FileUtils.getParentPath(file.fullPath) != bracketsRoot){
+				//gets the path of the file relative to brackets root
+				var relativePath 	= FileUtils.getRelativeFilename(bracketsRoot, file.fullPath);
+				var directoryName 	= relativePath.split("/")[0];
+				//we have our project path
+				return bracketsRoot + directoryName + "/";
+			}
+		}
+		
+		//not needed. Every selected file is automatically viewed
+//		//if all those failed, we check if the user has selected an item in the file tree view
+//		var file = ProjectManager.getSelectedItem(); //could be file or directory
+//		//if there is a selected file/directory and it's within the Brackets file tree
+//		if(file != null && ProjectManager.isWithinProject(file.fullPath)){
+//			//if the file is actually inside a java project and not just hanging on root
+//			if(FileUtils.getDirectoryPath(file.fullPath) != bracketsRoot){
+//				var relativePath	= FileUtils.getRelativeFilename(bracketsRoot, file.fullPath);
+//				var directoryName	= relativePath.split("/")[0];
+//				return bracketsRoot + directoryName;
+//			}
+//		}
+	}
+	
+	/**
+	 * Finds all files with the .java extension under a specific path.
+	 * @author Adel Wehbi
+	 * @param   {string}  path Path to be searched.
+	 * @returns {array} Array containing paths of java files.
+	 */
+	function findJavaFilesUnderPath(path){
+		//get all files in File Tree if they satisfy the filter
+		var fetchAllFiles		= ProjectManager.getAllFiles(function(file, number){
+			//ignore if not under projectPath
+			if(file.fullPath.indexOf(path) < 0)
+				return false;
+			
+			//if not a java file, ignore too
+			if(file.name.indexOf(".java") < 0)
+				return false;
+			
+			return true;
+		});
+		
+		var filePaths	=	[];
+		fetchAllFiles.then(function(allFiles){
+			for(var i = 0; i < allFiles.length; i++){
+				filePaths.push(allFiles[i].fullPath);
+			}
+		});
+		return filePaths;
+	}
+	
+	/**
+	 * Finds the name of the Java class that contains the main method.
+	 * @author Adel Wehbi
+	 * @param   {string} path Path to look under.
+	 * @returns {string} The class file that contains the "main" entry point
+	 */
+	function findJavaMainUnderPath(path){
+		var queryObject		= {
+			query: "public\\s+static\\s+void\\s+main",
+			caseSensitive: true,
+			isRegexp: true
+		};
+		//the scope of the java project to search inside
+		var scope			= FileSystem.getDirectoryForPath(path);
+		//the possible files in this scope
+		var candidateFiles = FindInFiles.getCandidateFiles(scope);
+		var searchTask 		= FindInFiles.doSearchInScope(queryObject, scope, null, null, candidateFiles);
+		
+		//when the search is completed
+		var className;
+		searchTask.then(function(result){
+			if($.isEmptyObject(result)){
+				className = undefined;
+				return;
+			}
+			//we only support one main method as of now, so just take first key which is the path
+			var foundFile;
+			for(var key in  result){
+				foundFile = key;
+				break;
+			}
+			className		= FileUtils.getFilenameWithoutExtension(FileUtils.getBaseName(foundFile));
+		});
+		return className;
+	}
+	
+	//listen to any output from running
 	basicjdk.on("output", function(event, text){
 		console.log(text);
 	});
@@ -56,14 +180,72 @@ define(function(require, exports, module){
 	});
 	
 	
-	
-	var command				= CommandManager.register(
-		'command',
-		'basicjdk.command',
+	//register the command for "Build Project"
+	var buildProjectCommand			= CommandManager.register(
+		"Build Java Project",
+		"basicjdk.buildProjectCommand",
 		function(){
-			run("/home/admin/.config/Brackets/extensions/user/brackets-basic-jdk/test.class");
+			var projectPath = findProjectPath();
+			if(projectPath != undefined){
+				var result = compileProject(projectPath, './bin');
+				//if compiler actually ran but failed
+				if(result){
+					console.error(result.stdout);
+					return;
+				}
+			}else
+				return;
 		}
 	);
 	
-	KeyBindingManager.addBinding(command, "Shift-F6");
+	//register the command for "Run Project"
+	var runProjectCommand			= CommandManager.register(
+		"Run Java Project",
+		"basicjdk.runProjectCommand",
+		function(){
+			var projectPath = findProjectPath();
+			if(projectPath != undefined){
+				var className	= findJavaMainUnderPath(projectPath);
+				run(projectPath + className);
+			}else
+				return;
+		}
+	);
+	
+	//register the command for the "Build and Run Java Project"
+	var buildAndRunProjectCommand	= CommandManager.register(
+		"Build and Run Java Project",
+		"basicjdk.buildAndRunProjectCommand",
+		function(){
+			var projectPath = findProjectPath();
+			if(projectPath != undefined){
+				var result = compileProject(projectPath, './bin');
+				//if compiler actually ran but failed
+//				if(result && result.code != 0){
+//					console.error(result.stderr);
+//					return;
+//				}
+				var className	= findJavaMainUnderPath(projectPath);
+				run(projectPath + className);
+			}else
+				return;
+			
+		}
+	);
+	
+	//add 2 menu options in the Edit tab for these two commands
+	//first get the Edit menu
+	var editMenu			= Menus.getMenu(Menus.AppMenuBar.EDIT_MENU);
+	//add a divider into the menu before our options to seperate both our commands from the rest
+	editMenu.addMenuDivider();
+	//now add both commands by their ID
+	editMenu.addMenuItem("basicjdk.buildProjectCommand");
+	editMenu.addMenuItem("basicjdk.runProjectCommand");
+	editMenu.addMenuItem("basicjdk.buildAndRunProjectCommand");
+	//add divider after too
+	editMenu.addMenuDivider();
+	
+	//bind keyboard shortcuts for both commands too
+	KeyBindingManager.addBinding(buildProjectCommand, "Shift-F6");
+	KeyBindingManager.addBinding(buildAndRunProjectCommand, "Ctrl-Shift-F6");
 });

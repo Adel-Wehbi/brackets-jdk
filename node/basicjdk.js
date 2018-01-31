@@ -15,9 +15,13 @@
 	 * @param   {string} outputPath The directory where the compiled file should be placed.
 	 * @returns {object} An object containing the exit code, stdout, and/or stderr.
 	 */
-	function compileFile(filePaths, outputPath){
+	function compileFiles(filePaths, outputPath){
+		if(filePaths.length == 0)
+			return false;
+		//create the bin location if it does not already exist
+		shell.mkdir("-p", outputPath);
 		//compile using the command javac filePath1 filePath2... -d outputPath
-		var result = shell.exec("javac '" + filePaths.join(" ") + "' -d '" + outputPath + "'");
+		var result = shell.exec("javac " + filePaths.join(" ") + " -d '" + outputPath + "'");
 		
 		//result object is of the form {code: ..., stdout:..., stderr:...}
 		return result;
@@ -60,7 +64,7 @@
 			//before the current one is killed
 			if(this == currentProcess)
 				currentProcess	= undefined;
-			console.log("Java process exited with code: " + code);
+			console.log("Java app process exited with code: " + code);
 		});
 		
 		//for future reference
@@ -93,15 +97,15 @@
             domainManager.registerDomain("basicjdk", {major: 0, minor: 1});
         }
 		
-	   //expose the compileFile function to the webkit end
+	  	//expose the compileFile function to the webkit end
 		domainManager.registerCommand(
 			"basicjdk",
-			"compileFile",
-			compileFile,
+			"compileFiles",
+			compileFiles,
 			false,
-			"Compiles a single java file to a specific directory.",
+			"Compiles an array of java files to a specific directory.",
 			[
-				{name: "filePath",		type: "string", description: "Path of file to compile."},
+				{name: "filePath",		type: "array",  description: "Array of paths of files to compile."},
 				{name: "outputPath",	type: "string", description: "Path of directory to compile to."}
 			],
 			[
@@ -109,8 +113,8 @@
 			]
 		);
 	   
-	   //expose the run function to the webkit end
-	   domainManager.registerCommand(
+	  	//expose the run function to the webkit end
+	  	domainManager.registerCommand(
 		   "basicjdk",
 		   "run",
 		   run,
@@ -123,10 +127,10 @@
 		   [
 			   {name: "write",			type: "function",	description: "A callback to be used to write to stdin."}
 		   ]
-	   );
+	  	);
 	   
-	   //expose the writeToProcess function to the webkit end
-	   domainManager.registerCommand(
+	  	//expose the writeToProcess function to the webkit end
+	  	domainManager.registerCommand(
 		   "basicjdk",
 		   "writeToStdin",
 		   false,
@@ -134,25 +138,25 @@
 		   [
 			   {name: "text",		type: "string", description: "The text to write to Stdin."}
 		   ]
-	   );
+	  	);
 	   
 	   //register an stdout event
-	   domainManager.registerEvent(
+	  	domainManager.registerEvent(
 		   "basicjdk",
 		   "output",
 		   [
 			   {name: "ouputText", 	type: "string", description: "The text of stdout."}
 		   ]
-	   );
-	   
-	   //register an stderr event
-	   domainManager.registerEvent(
+	  	);
+	  	
+	  	//register an stderr event
+	  	domainManager.registerEvent(
 		   "basicjdk",
 		   "error",
 		   [
 			   {name: "errorText", 	type: "string", description: "The text of stderr."}
 		   ]
-	   );
+	  	);
 	}
     
     exports.init = init;
