@@ -22,7 +22,7 @@ define(function(require, exports, module){
 	 * @author Adel Wehbi
 	 * @param   {array}  filePaths  An array containing the paths of the files to be compiled.
 	 * @param   {string} outputPath The path of the directory in which the compiled file should be placed.
-	 * @returns {object} An object containing the process exit code, stdout, and stderr of the compile command.
+	 * @returns {Promise} A promise that resolves after compilation with true for success and false for fail.
 	 */
 	function compileFiles(filePaths, outputPath){
 		return basicjdk.exec(
@@ -37,7 +37,7 @@ define(function(require, exports, module){
 	 * @author Adel Wehbi
 	 * @param   {string} projectPath Path to java project.
 	 * @param   {string} outputPath  The output path for the compiled files RELATIVE TO PROJECT PATH
-	 * @returns {object} Object containing process exit code, stdout, and stderr.
+	 * @returns {Promise} The promise returned by compileFiles().
 	 */
 	function compileProject(projectPath, outputPath){
 		
@@ -137,7 +137,7 @@ define(function(require, exports, module){
 	 * Finds the name of the Java class that contains the main method.
 	 * @author Adel Wehbi
 	 * @param   {string} path Path to look under.
-	 * @returns {string} The class file that contains the "main" entry point
+	 * @returns {Promise} The promise that is resolved when the result is found.
 	 */
 	function findJavaMainUnderPath(path){
 		var queryObject		= {
@@ -151,9 +151,9 @@ define(function(require, exports, module){
 		var candidateFiles = FindInFiles.getCandidateFiles(scope);
 		var searchTask 		= FindInFiles.doSearchInScope(queryObject, scope, null, null, candidateFiles);
 		
-		//when the search is completed
-		var className;
-		searchTask.then(function(result){
+		//return a promise
+		return searchTask.then(function(result){
+			var className;
 			if($.isEmptyObject(result)){
 				className = undefined;
 				return;
@@ -165,8 +165,8 @@ define(function(require, exports, module){
 				break;
 			}
 			className		= FileUtils.getFilenameWithoutExtension(FileUtils.getBaseName(foundFile));
+			return className;
 		});
-		return className;
 	}
 	
 	//listen to any output from running
@@ -187,16 +187,9 @@ define(function(require, exports, module){
 		function(){
 			var projectPath = findProjectPath();
 			if(projectPath != undefined){
-				var result = compileProject(projectPath, './bin');
-				//if compiler actually ran but failed
-				if(result){
-					console.error(result.stdout);
-					return;
-				}
-			}else
-				return;
+				compileProject(projectPath, './bin')
 		}
-	);
+	});
 	
 	//register the command for "Run Project"
 	var runProjectCommand			= CommandManager.register(
@@ -205,8 +198,11 @@ define(function(require, exports, module){
 		function(){
 			var projectPath = findProjectPath();
 			if(projectPath != undefined){
-				var className	= findJavaMainUnderPath(projectPath);
-				run(projectPath + className);
+				findJavaMainUnderPath(projectPath).then(function(className){
+					//if we can't find the class main
+					if(className != undefined)
+						run(projectPath + "./bin/" + className);
+				});
 			}else
 				return;
 		}
@@ -219,14 +215,18 @@ define(function(require, exports, module){
 		function(){
 			var projectPath = findProjectPath();
 			if(projectPath != undefined){
-				var result = compileProject(projectPath, './bin');
-				//if compiler actually ran but failed
-//				if(result && result.code != 0){
-//					console.error(result.stderr);
-//					return;
-//				}
-				var className	= findJavaMainUnderPath(projectPath);
-				run(projectPath + className);
+				compileProject(projectPath, './bin').then(function(result){
+					//if compilation failed
+					if(!result)
+						return;
+					findJavaMainUnderPath(projectPath).then(function(className){
+						//if we can't find the class main
+						if(className != undefined){
+							run(projectPath + "./bin/" + className);
+						}
+					});
+				});
+				
 			}else
 				return;
 			

@@ -9,11 +9,11 @@
 	
     
 	/**
-	 * Compiles an array of java files.
+	 * Compiles an array of java files. Emits an error event in case compilation fails.
 	 * @author Adel Wehbi
-	 * @param   {array}  filePath   An array containing the paths of the java files to compile.
-	 * @param   {string} outputPath The directory where the compiled file should be placed.
-	 * @returns {object} An object containing the exit code, stdout, and/or stderr.
+	 * @param   {Array}   filePaths  Array of paths of .java files to compile.
+	 * @param   {string}  outputPath The directory where the compiled files should be placed.
+	 * @returns {boolean} Returns false if compilation failed for any reason, and true if it didn't.
 	 */
 	function compileFiles(filePaths, outputPath){
 		if(filePaths.length == 0)
@@ -23,8 +23,15 @@
 		//compile using the command javac filePath1 filePath2... -d outputPath
 		var result = shell.exec("javac " + filePaths.join(" ") + " -d '" + outputPath + "'");
 		
-		//result object is of the form {code: ..., stdout:..., stderr:...}
-		return result;
+		if(result.stderr){
+			_domainManager.emitEvent("basicjdk", "error", result.stderr);
+			return false;
+		}
+		
+		_domainManager.emitEvent("basicjdk", "output", "Compilation Successful!")
+		
+		return true;
+
 	}
 	
 	
@@ -64,7 +71,7 @@
 			//before the current one is killed
 			if(this == currentProcess)
 				currentProcess	= undefined;
-			console.log("Java app process exited with code: " + code);
+			_domainManager.emitEvent("basicjdk", "output", "Java process exited with code: " + code);
 		});
 		
 		//for future reference
