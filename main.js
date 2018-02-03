@@ -15,7 +15,13 @@ define(function(require, exports, module){
 	
 	
 	//load basicjdk NodeDomain that contains all our backend functions (everything that needs shell access basically)
-	var basicjdk = new NodeDomain("basicjdk", ExtensionUtils.getModulePath(module, "node/basicjdk"));
+	var basicjdk 			= new NodeDomain("basicjdk", ExtensionUtils.getModulePath(module, "node/basicjdk"));
+	
+	
+	//our libraries
+	var console				= require("console"); //to log to dev tools for debugging instead, use the global variable for console (or comment it out if main.js only uses functions log and error)
+
+	//************** define our main.js functions ***********************//
 	
 	/**
 	 * Calls basicjdk's compileFiles function on the Nodejs end.
@@ -169,6 +175,10 @@ define(function(require, exports, module){
 		});
 	}
 	
+	//******************* Begin initializing Everything *****************//
+	
+	
+	//***********************LISTENERS*************************//
 	//listen to any output from running
 	basicjdk.on("output", function(event, text){
 		console.log(text);
@@ -179,7 +189,7 @@ define(function(require, exports, module){
 		console.error(text);
 	});
 	
-	
+	//***********************COMMANDS*************************//
 	//register the command for "Build Project"
 	var buildProjectCommand			= CommandManager.register(
 		"Build Java Project",
@@ -233,6 +243,8 @@ define(function(require, exports, module){
 		}
 	);
 	
+	
+	//*******************EDIT MENU***************************//
 	//add 2 menu options in the Edit tab for these two commands
 	//first get the Edit menu
 	var editMenu			= Menus.getMenu(Menus.AppMenuBar.EDIT_MENU);
@@ -245,6 +257,8 @@ define(function(require, exports, module){
 	//add divider after too
 	editMenu.addMenuDivider();
 	
+	
+	//********************KEYBOARD SHORTCUTS*****************//
 	//bind keyboard shortcuts for both commands too
 	KeyBindingManager.addBinding(buildProjectCommand, "Shift-F6");
 	KeyBindingManager.addBinding(buildAndRunProjectCommand, "Ctrl-Shift-F6");

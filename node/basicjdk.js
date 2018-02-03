@@ -18,8 +18,12 @@
 	function compileFiles(filePaths, outputPath){
 		if(filePaths.length == 0)
 			return false;
+		
 		//create the bin location if it does not already exist
 		shell.mkdir("-p", outputPath);
+		
+		_domainManager.emitEvent("basicjdk", "output", "Compiling...\n");
+		
 		//compile using the command javac filePath1 filePath2... -d outputPath
 		var result = shell.exec("javac " + filePaths.join(" ") + " -d '" + outputPath + "'");
 		
@@ -28,7 +32,7 @@
 			return false;
 		}
 		
-		_domainManager.emitEvent("basicjdk", "output", "Compilation Successful!")
+		_domainManager.emitEvent("basicjdk", "output", "All files compiled successfully!\n");
 		
 		return true;
 
@@ -52,6 +56,8 @@
 		//change directory to that of the class to execute
 		shell.cd(directory);
 		
+		_domainManager.emitEvent("basicjdk", "output", "Running...\n")
+		
 		//start the new process
 		var process			= shell.exec("java " + className, {async: true});
 		
@@ -71,7 +77,7 @@
 			//before the current one is killed
 			if(this == currentProcess)
 				currentProcess	= undefined;
-			_domainManager.emitEvent("basicjdk", "output", "Java process exited with code: " + code);
+			_domainManager.emitEvent("basicjdk", "output", "Java process exited with code: " + code + "\n");
 		});
 		
 		//for future reference
