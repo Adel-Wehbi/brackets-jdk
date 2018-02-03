@@ -1,4 +1,4 @@
-# brackets-basic-jdk
+# brackets-jdk
 
 This is meant to be an extension to the <a href="http://brackets.io/">Brackets Editor</a> 
 that provides basic Java Development Kit integration. 
