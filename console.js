@@ -13,7 +13,7 @@ define(function(require, exports, module){
 	 * @author Adel Wehbi
 	 */
 	function _init(){
-		PanelManager.createBottomPanel("basicjdk.console", _$panel, 100);
+		PanelManager.createBottomPanel("bracketsjdk.console", _$panel, 100);
 		_$panel.find(".close").on("click", function(){
 			hide();
 		});

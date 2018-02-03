@@ -22,17 +22,17 @@
 		//create the bin location if it does not already exist
 		shell.mkdir("-p", outputPath);
 		
-		_domainManager.emitEvent("basicjdk", "output", "Compiling...\n");
+		_domainManager.emitEvent("bracketsjdk", "output", "Compiling...\n");
 		
 		//compile using the command javac filePath1 filePath2... -d outputPath
-		var result = shell.exec("javac " + filePaths.join(" ") + " -d '" + outputPath + "'");
+		var result = shell.exec("javac '" + filePaths.join("' '") + "' -d '" + outputPath + "'");
 		
 		if(result.stderr){
-			_domainManager.emitEvent("basicjdk", "error", result.stderr);
+			_domainManager.emitEvent("bracketsjdk", "error", result.stderr);
 			return false;
 		}
 		
-		_domainManager.emitEvent("basicjdk", "output", "All files compiled successfully!\n");
+		_domainManager.emitEvent("bracketsjdk", "output", "All files compiled successfully!\n");
 		
 		return true;
 
@@ -56,19 +56,19 @@
 		//change directory to that of the class to execute
 		shell.cd(directory);
 		
-		_domainManager.emitEvent("basicjdk", "output", "Running...\n")
+		_domainManager.emitEvent("bracketsjdk", "output", "Running...\n")
 		
 		//start the new process
 		var process			= shell.exec("java " + className, {async: true});
 		
 		//listener for output on process stdout
 		process.stdout.on("data", function(data){
-			_domainManager.emitEvent("basicjdk", "output", data);
+			_domainManager.emitEvent("bracketsjdk", "output", data);
 		});
 		
 		//listener for errors on process stderr
 		process.stderr.on("data", function(data){
-			_domainManager.emitEvent("basicjdk", "error", data);
+			_domainManager.emitEvent("bracketsjdk", "error", data);
 		});
 		
 		//clear the currentProcess variable if process exited
@@ -77,7 +77,7 @@
 			//before the current one is killed
 			if(this == currentProcess)
 				currentProcess	= undefined;
-			_domainManager.emitEvent("basicjdk", "output", "Java process exited with code: " + code + "\n");
+			_domainManager.emitEvent("bracketsjdk", "output", "Java process exited with code: " + code + "\n");
 		});
 		
 		//for future reference
@@ -99,20 +99,20 @@
     
 	
 	/**
-	 * Initialize the basicjdk NodeDomain, expose its functions to the webkit end, and register its events.
+	 * Initialize the bracketsjdk NodeDomain, expose its functions to the webkit end, and register its events.
 	 * @author Adel Wehbi
 	 * @param {object} domainManager Bracket's Domain Managers
 	 */
 	function init(domainManager){
 	   	_domainManager			=	domainManager;
 	   
-		if (!domainManager.hasDomain("basicjdk")) {
-            domainManager.registerDomain("basicjdk", {major: 0, minor: 1});
+		if (!domainManager.hasDomain("bracketsjdk")) {
+            domainManager.registerDomain("bracketsjdk", {major: 0, minor: 1});
         }
 		
 	  	//expose the compileFile function to the webkit end
 		domainManager.registerCommand(
-			"basicjdk",
+			"bracketsjdk",
 			"compileFiles",
 			compileFiles,
 			false,
@@ -128,7 +128,7 @@
 	   
 	  	//expose the run function to the webkit end
 	  	domainManager.registerCommand(
-		   "basicjdk",
+		   "bracketsjdk",
 		   "run",
 		   run,
 		   false,
@@ -144,7 +144,7 @@
 	   
 	  	//expose the writeToProcess function to the webkit end
 	  	domainManager.registerCommand(
-		   "basicjdk",
+		   "bracketsjdk",
 		   "writeToStdin",
 		   false,
 		   "Writes text to Standard Input of currently running process.",
@@ -155,7 +155,7 @@
 	   
 	   //register an stdout event
 	  	domainManager.registerEvent(
-		   "basicjdk",
+		   "bracketsjdk",
 		   "output",
 		   [
 			   {name: "ouputText", 	type: "string", description: "The text of stdout."}
@@ -164,7 +164,7 @@
 	  	
 	  	//register an stderr event
 	  	domainManager.registerEvent(
-		   "basicjdk",
+		   "bracketsjdk",
 		   "error",
 		   [
 			   {name: "errorText", 	type: "string", description: "The text of stderr."}

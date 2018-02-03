@@ -14,8 +14,8 @@ define(function(require, exports, module){
 	var KeyBindingManager	= brackets.getModule("command/KeyBindingManager");
 	
 	
-	//load basicjdk NodeDomain that contains all our backend functions (everything that needs shell access basically)
-	var basicjdk 			= new NodeDomain("basicjdk", ExtensionUtils.getModulePath(module, "node/basicjdk"));
+	//load bracketsjdk NodeDomain that contains all our backend functions (everything that needs shell access basically)
+	var bracketsjdk 			= new NodeDomain("bracketsjdk", ExtensionUtils.getModulePath(module, "node/bracketsjdk"));
 	
 	
 	//our libraries
@@ -24,14 +24,14 @@ define(function(require, exports, module){
 	//************** define our main.js functions ***********************//
 	
 	/**
-	 * Calls basicjdk's compileFiles function on the Nodejs end.
+	 * Calls bracketsjdk's compileFiles function on the Nodejs end.
 	 * @author Adel Wehbi
 	 * @param   {array}  filePaths  An array containing the paths of the files to be compiled.
 	 * @param   {string} outputPath The path of the directory in which the compiled file should be placed.
 	 * @returns {Promise} A promise that resolves after compilation with true for success and false for fail.
 	 */
 	function compileFiles(filePaths, outputPath){
-		return basicjdk.exec(
+		return bracketsjdk.exec(
 			"compileFiles",
 			filePaths,
 			outputPath
@@ -54,7 +54,7 @@ define(function(require, exports, module){
 	}
 	
 	/**
-	 * Calls basicjdk's run function on the Nodejs end.
+	 * Calls bracketsjdk's run function on the Nodejs end.
 	 * @author Adel Wehbi
 	 * @param {string} filePath The path of the .class file to run.
 	 */
@@ -65,7 +65,7 @@ define(function(require, exports, module){
 		//so we're left with the class name only
 		var className		= FileUtils.getFilenameWithoutExtension(FileUtils.getBaseName(filePath));
 		
-		basicjdk.exec(
+		bracketsjdk.exec(
 			"run",
 			directory,
 			className
@@ -180,12 +180,12 @@ define(function(require, exports, module){
 	
 	//***********************LISTENERS*************************//
 	//listen to any output from running
-	basicjdk.on("output", function(event, text){
+	bracketsjdk.on("output", function(event, text){
 		console.log(text);
 	});
 	
 	//same but for errors
-	basicjdk.on("error", function(event, text){
+	bracketsjdk.on("error", function(event, text){
 		console.error(text);
 	});
 	
@@ -193,7 +193,7 @@ define(function(require, exports, module){
 	//register the command for "Build Project"
 	var buildProjectCommand			= CommandManager.register(
 		"Build Java Project",
-		"basicjdk.buildProjectCommand",
+		"bracketsjdk.buildProjectCommand",
 		function(){
 			var projectPath = findProjectPath();
 			if(projectPath != undefined){
@@ -204,7 +204,7 @@ define(function(require, exports, module){
 	//register the command for "Run Project"
 	var runProjectCommand			= CommandManager.register(
 		"Run Java Project",
-		"basicjdk.runProjectCommand",
+		"bracketsjdk.runProjectCommand",
 		function(){
 			var projectPath = findProjectPath();
 			if(projectPath != undefined){
@@ -221,7 +221,7 @@ define(function(require, exports, module){
 	//register the command for the "Build and Run Java Project"
 	var buildAndRunProjectCommand	= CommandManager.register(
 		"Build and Run Java Project",
-		"basicjdk.buildAndRunProjectCommand",
+		"bracketsjdk.buildAndRunProjectCommand",
 		function(){
 			var projectPath = findProjectPath();
 			if(projectPath != undefined){
@@ -251,9 +251,9 @@ define(function(require, exports, module){
 	//add a divider into the menu before our options to seperate both our commands from the rest
 	editMenu.addMenuDivider();
 	//now add both commands by their ID
-	editMenu.addMenuItem("basicjdk.buildProjectCommand");
-	editMenu.addMenuItem("basicjdk.runProjectCommand");
-	editMenu.addMenuItem("basicjdk.buildAndRunProjectCommand");
+	editMenu.addMenuItem("bracketsjdk.buildProjectCommand");
+	editMenu.addMenuItem("bracketsjdk.runProjectCommand");
+	editMenu.addMenuItem("bracketsjdk.buildAndRunProjectCommand");
 	//add divider after too
 	editMenu.addMenuDivider();
 	
