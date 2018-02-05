@@ -22,7 +22,7 @@
 		//create the bin location if it does not already exist
 		shell.mkdir("-p", outputPath);
 		
-		_domainManager.emitEvent("bracketsjdk", "output", "Compiling...\n");
+		_domainManager.emitEvent("bracketsjdk", "log", "Compiling...");
 		
 		//compile using the command javac filePath1 filePath2... -d outputPath
 		var result = shell.exec("javac '" + filePaths.join("' '") + "' -d '" + outputPath + "'");
@@ -32,7 +32,7 @@
 			return false;
 		}
 		
-		_domainManager.emitEvent("bracketsjdk", "output", "All files compiled successfully!\n");
+		_domainManager.emitEvent("bracketsjdk", "log", "All files compiled successfully!");
 		
 		return true;
 
@@ -56,7 +56,7 @@
 		//change directory to that of the class to execute
 		shell.cd(directory);
 		
-		_domainManager.emitEvent("bracketsjdk", "output", "Running...\n")
+		_domainManager.emitEvent("bracketsjdk", "log", "Running class "+className+"...")
 		
 		//start the new process
 		var process			= shell.exec("java " + className, {async: true});
@@ -77,7 +77,7 @@
 			//before the current one is killed
 			if(this == currentProcess)
 				currentProcess	= undefined;
-			_domainManager.emitEvent("bracketsjdk", "output", "Java process exited with code: " + code + "\n");
+			_domainManager.emitEvent("bracketsjdk", "log", "Java exited with code: " + code);
 		});
 		
 		//for future reference
@@ -146,6 +146,7 @@
 	  	domainManager.registerCommand(
 		   "bracketsjdk",
 		   "writeToStdin",
+			writeToStdin,
 		   false,
 		   "Writes text to Standard Input of currently running process.",
 		   [
@@ -153,7 +154,16 @@
 		   ]
 	  	);
 	   
-	   //register an stdout event
+		//register a log event
+		_domainManager.registerEvent(
+			"bracketsjdk",
+			"log",
+			[
+				{name: "logText", type: "string", description: "Line to log."}
+			]
+		);
+		
+	   	//register an stdout event
 	  	domainManager.registerEvent(
 		   "bracketsjdk",
 		   "output",

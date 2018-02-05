@@ -19,7 +19,7 @@ define(function(require, exports, module){
 	
 	
 	//our libraries
-	var console				= require("console"); //to log to dev tools for debugging instead, use the global variable for console (or comment it out if main.js only uses functions log and error)
+	var console				= require("console"); //to log to dev tools for debugging instead, use window.console instead.
 
 	//************** define our main.js functions ***********************//
 	
@@ -70,6 +70,16 @@ define(function(require, exports, module){
 			directory,
 			className
 		);
+	}
+	
+	
+	/**
+	 * Calls bracketjdk's function with the same name that writes to the currently running process
+	 * @author Adel Wehbi
+	 * @param {string} input Input text.
+	 */
+	function writeToStdin(input){
+		bracketsjdk.exec("writeToStdin", input);
 	}
 	
 	
@@ -179,14 +189,24 @@ define(function(require, exports, module){
 	
 	
 	//***********************LISTENERS*************************//
-	//listen to any output from running
-	bracketsjdk.on("output", function(event, text){
+	
+	//listen to logs coming from our backend
+	bracketsjdk.on("log", function(event, text){
 		console.log(text);
+	});
+	
+	//listen to any output
+	bracketsjdk.on("output", function(event, text){
+		console.output(text);
 	});
 	
 	//same but for errors
 	bracketsjdk.on("error", function(event, text){
 		console.error(text);
+	});
+	//listen to any input coming in from the console
+	console.onInput(function(input){
+		writeToStdin(input);
 	});
 	
 	//***********************COMMANDS*************************//
@@ -245,10 +265,10 @@ define(function(require, exports, module){
 	
 	
 	//*******************EDIT MENU***************************//
-	//add 2 menu options in the Edit tab for these two commands
+	//add 2 menu options in the Edit tab for these three commands
 	//first get the Edit menu
 	var editMenu			= Menus.getMenu(Menus.AppMenuBar.EDIT_MENU);
-	//add a divider into the menu before our options to seperate both our commands from the rest
+	//add a divider into the menu before our options to seperate our commands from the rest
 	editMenu.addMenuDivider();
 	//now add both commands by their ID
 	editMenu.addMenuItem("bracketsjdk.buildProjectCommand");
