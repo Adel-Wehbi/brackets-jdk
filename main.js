@@ -20,8 +20,103 @@ define(function(require, exports, module){
 	
 	//our libraries
 	var console				= require("console"); //to log to dev tools for debugging instead, use window.console instead.
-
+	
 	//************** define our main.js functions ***********************//
+	
+	function init(){
+		//listen to logs coming from our backend
+		bracketsjdk.on("log", function(event, text){
+			console.log(text);
+		});
+		
+		//listen to any output
+		bracketsjdk.on("output", function(event, text){
+			console.output(text);
+		});
+		
+		//same but for errors
+		bracketsjdk.on("error", function(event, text){
+			console.error(text);
+		});
+		//listen to any input coming in from the console
+		console.onInput(function(input){
+			writeToStdin(input);
+		});
+		
+		//***********************COMMANDS*************************//
+		//register the command for "Build Project"
+		var buildProjectCommand			= CommandManager.register(
+			"Build Java Project",
+			"bracketsjdk.buildProjectCommand",
+			function(){
+				var projectPath = findProjectPath();
+				if(projectPath != undefined){
+					compileProject(projectPath, './bin/')
+			}
+		});
+		
+		//register the command for "Run Project"
+		var runProjectCommand			= CommandManager.register(
+			"Run Java Project",
+			"bracketsjdk.runProjectCommand",
+			function(){
+				var projectPath = findProjectPath();
+				if(projectPath != undefined){
+					findJavaMainUnderPath(projectPath).then(function(className){
+						//if we can't find the class main
+						if(className != undefined)
+							run(projectPath + "./bin/" + className);
+					});
+				}else
+					return;
+			}
+		);
+		
+		//register the command for the "Build and Run Java Project"
+		var buildAndRunProjectCommand	= CommandManager.register(
+			"Build and Run Java Project",
+			"bracketsjdk.buildAndRunProjectCommand",
+			function(){
+				var projectPath = findProjectPath();
+				if(projectPath != undefined){
+					compileProject(projectPath, './bin/').then(function(result){
+						//if compilation failed
+						if(!result)
+							return;
+						findJavaMainUnderPath(projectPath).then(function(className){
+							//if we can't find the class main
+							if(className != undefined){
+								run(projectPath + "./bin/" + className);
+							}
+						});
+					});
+					
+				}else
+					return;
+				
+			}
+		);
+		
+		
+		//*******************EDIT MENU***************************//
+		//add 2 menu options in the Edit tab for these three commands
+		//first get the Edit menu
+		var editMenu			= Menus.getMenu(Menus.AppMenuBar.EDIT_MENU);
+		//add a divider into the menu before our options to seperate our commands from the rest
+		editMenu.addMenuDivider();
+		//now add both commands by their ID
+		editMenu.addMenuItem("bracketsjdk.buildProjectCommand");
+		editMenu.addMenuItem("bracketsjdk.runProjectCommand");
+		editMenu.addMenuItem("bracketsjdk.buildAndRunProjectCommand");
+		//add divider after too
+		editMenu.addMenuDivider();
+		
+		
+		//********************KEYBOARD SHORTCUTS*****************//
+		//bind keyboard shortcuts for both commands too
+		KeyBindingManager.addBinding(buildProjectCommand, "Shift-F6");
+		KeyBindingManager.addBinding(buildAndRunProjectCommand, "Ctrl-Shift-F6");
+	}
 	
 	/**
 	 * Calls bracketsjdk's compileFiles function on the Nodejs end.
@@ -185,101 +280,6 @@ define(function(require, exports, module){
 		});
 	}
 	
-	//******************* Begin initializing Everything *****************//
-	
-	
-	//***********************LISTENERS*************************//
-	
-	//listen to logs coming from our backend
-	bracketsjdk.on("log", function(event, text){
-		console.log(text);
-	});
-	
-	//listen to any output
-	bracketsjdk.on("output", function(event, text){
-		console.output(text);
-	});
-	
-	//same but for errors
-	bracketsjdk.on("error", function(event, text){
-		console.error(text);
-	});
-	//listen to any input coming in from the console
-	console.onInput(function(input){
-		writeToStdin(input);
-	});
-	
-	//***********************COMMANDS*************************//
-	//register the command for "Build Project"
-	var buildProjectCommand			= CommandManager.register(
-		"Build Java Project",
-		"bracketsjdk.buildProjectCommand",
-		function(){
-			var projectPath = findProjectPath();
-			if(projectPath != undefined){
-				compileProject(projectPath, './bin')
-		}
-	});
-	
-	//register the command for "Run Project"
-	var runProjectCommand			= CommandManager.register(
-		"Run Java Project",
-		"bracketsjdk.runProjectCommand",
-		function(){
-			var projectPath = findProjectPath();
-			if(projectPath != undefined){
-				findJavaMainUnderPath(projectPath).then(function(className){
-					//if we can't find the class main
-					if(className != undefined)
-						run(projectPath + "./bin/" + className);
-				});
-			}else
-				return;
-		}
-	);
-	
-	//register the command for the "Build and Run Java Project"
-	var buildAndRunProjectCommand	= CommandManager.register(
-		"Build and Run Java Project",
-		"bracketsjdk.buildAndRunProjectCommand",
-		function(){
-			var projectPath = findProjectPath();
-			if(projectPath != undefined){
-				compileProject(projectPath, './bin').then(function(result){
-					//if compilation failed
-					if(!result)
-						return;
-					findJavaMainUnderPath(projectPath).then(function(className){
-						//if we can't find the class main
-						if(className != undefined){
-							run(projectPath + "./bin/" + className);
-						}
-					});
-				});
-				
-			}else
-				return;
-			
-		}
-	);
-	
-	
-	//*******************EDIT MENU***************************//
-	//add 2 menu options in the Edit tab for these three commands
-	//first get the Edit menu
-	var editMenu			= Menus.getMenu(Menus.AppMenuBar.EDIT_MENU);
-	//add a divider into the menu before our options to seperate our commands from the rest
-	editMenu.addMenuDivider();
-	//now add both commands by their ID
-	editMenu.addMenuItem("bracketsjdk.buildProjectCommand");
-	editMenu.addMenuItem("bracketsjdk.runProjectCommand");
-	editMenu.addMenuItem("bracketsjdk.buildAndRunProjectCommand");
-	//add divider after too
-	editMenu.addMenuDivider();
-	
-	
-	//********************KEYBOARD SHORTCUTS*****************//
-	//bind keyboard shortcuts for both commands too
-	KeyBindingManager.addBinding(buildProjectCommand, "Shift-F6");
-	KeyBindingManager.addBinding(buildAndRunProjectCommand, "Ctrl-Shift-F6");
+	//and finally... Let there be light
+	init();
 });

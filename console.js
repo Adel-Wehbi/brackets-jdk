@@ -3,7 +3,8 @@ define(function(require, exports, module){
 	
 	//all the ui stuff
 	var _$panel			= $(require('text!html/console.html'));
-	var _$content		= _$panel.find("#output");
+	var _$contentWrapper= _$panel.find("#content-wrapper");
+	var _$output		= _$panel.find("#output");
 	var _$caret			= _$panel.find(".custom-caret");
 	var _$input			= _$panel.find("#input");
 	var _$inputContent	= _$panel.find("#input-content");
@@ -32,6 +33,7 @@ define(function(require, exports, module){
 			_blinkCursor();
 			//start listening to input
 			_listenToInput();
+			console.log(_$panel.find("#content-wrapper").css("height"));
 		});
 	}
 	
@@ -48,6 +50,12 @@ define(function(require, exports, module){
 		});		
 	}
 	
+	/**
+	 * Listens for clicks in the console and grabs focus after a click event. Listens to 
+	 * the Enter key and then calls the _input callback with the input content.
+	 * @private
+	 * @author Adel Wehbi
+	 */
 	function _listenToInput(){
 		//grab the focus on click
 		_$panel.on("click", function(){
@@ -75,6 +83,10 @@ define(function(require, exports, module){
 			_$inputContent.html(_$input.val());
 		});
 	};
+	
+	function _scrollToBottom(){
+		_$contentWrapper.scrollTop(_$contentWrapper[0].scrollHeight);
+	}
 	
 	/**
 	 * Returns current time for logging purposes.
@@ -145,7 +157,8 @@ define(function(require, exports, module){
 	function log(text){
 		if(!_visible)
 			show();
-		_$content.append("["+_getTime()+"]: "+text + "\n");
+		_$output.append("["+_getTime()+"]: "+text + "\n");
+		_scrollToBottom();
 	}
 	
 	/**
@@ -156,7 +169,8 @@ define(function(require, exports, module){
 	function output(text){
 		if(!_visible)
 			show();
-		_$content.append(text);
+		_$output.append(text);
+		_scrollToBottom();
 	}
 	
 	/**
@@ -167,7 +181,8 @@ define(function(require, exports, module){
 	function error(text){
 		if(!_visible)
 			show();
-		_$content.append(text);
+		_$output.append(text);
+		_scrollToBottom();
 	}
 	
 	

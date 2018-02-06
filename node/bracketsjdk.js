@@ -22,6 +22,9 @@
 		//create the bin location if it does not already exist
 		shell.mkdir("-p", outputPath);
 		
+		//empty it (in case file names were changed)
+		shell.rm("-rf", outputPath + "*");
+		
 		_domainManager.emitEvent("bracketsjdk", "log", "Compiling...");
 		
 		//compile using the command javac filePath1 filePath2... -d outputPath
@@ -32,7 +35,7 @@
 			return false;
 		}
 		
-		_domainManager.emitEvent("bracketsjdk", "log", "All files compiled successfully!");
+		_domainManager.emitEvent("bracketsjdk", "log", "Done.");
 		
 		return true;
 
@@ -49,6 +52,11 @@
 		//if there is already a process running, send it a SIGINT (equivalent to control-c)
 		if(currentProcess != undefined){
 			currentProcess.kill("SIGINT");
+			//wait for process death before running again
+			currentProcess.on("kill", function(code, signal){
+				run(directory, className);
+			});
+			return;
 		}
 
 		//TODO if SIGINT does not kill the process, send a SIGTERM
@@ -78,6 +86,7 @@
 			if(this == currentProcess)
 				currentProcess	= undefined;
 			_domainManager.emitEvent("bracketsjdk", "log", "Java exited with code: " + code);
+			_domainManager.emitEvent("bracketsjdk", "output", "\n")
 		});
 		
 		//for future reference
