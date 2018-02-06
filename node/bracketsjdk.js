@@ -28,7 +28,7 @@
 		_domainManager.emitEvent("bracketsjdk", "log", "Compiling...");
 		
 		//compile using the command javac filePath1 filePath2... -d outputPath
-		var result = shell.exec("javac '" + filePaths.join("' '") + "' -d '" + outputPath + "'");
+		var result = shell.exec("javac \"" + filePaths.join("\" \"") + "\" -d \"" + outputPath + "\"");
 		
 		if(result.stderr){
 			_domainManager.emitEvent("bracketsjdk", "error", result.stderr);
