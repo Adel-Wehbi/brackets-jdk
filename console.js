@@ -11,6 +11,7 @@ define(function(require, exports, module) {
     var _visible            = false;
 
     var inputCallback;
+    var killCallback;
 
     var WorkspaceManager    = brackets.getModule("view/WorkspaceManager");
     var Resizer             = brackets.getModule("utils/Resizer");
@@ -29,11 +30,21 @@ define(function(require, exports, module) {
             _$panel.find(".close").on("click", function() {
                 hide();
             });
+
+            //listen to the "Clear" click
+            _$panel.find(".clear").on("click", function(){
+                clear();
+            });
+
+            //listen to the "Stop" button click
+            _$panel.find(".kill").on("click", function(){
+                _kill();
+            });
+
             //start blinking the cursor
             _blinkCursor();
             //start listening to input
             _listenToInput();
-            console.log(_$panel.find("#content-wrapper").css("height"));
         });
     }
 
@@ -109,16 +120,25 @@ define(function(require, exports, module) {
     }
 
     /**
-     * Called when the user enters something into the console. Triggers the "input" event.
+     * Called when the user enters something into the console.
      * @private
      * @author Adel Wehbi
      * @param {string} text Text entered by the user.
      */
     function _input(text) {
-        if (inputCallback != undefined)
+        if(inputCallback != undefined)
             inputCallback(text);
     }
 
+    /**
+     * Called when the user clicks the Stop button.
+     * @author Adel Wehbi
+     * @private
+     */
+    function _kill(){
+        if(killCallback != undefined)
+            killCallback();
+    }
 
     /**
      * Sets the the callback that is called when console receives input.
@@ -127,6 +147,15 @@ define(function(require, exports, module) {
      */
     function onInput(callback) {
         inputCallback = callback;
+    }
+
+    /**
+     * Sets the callback for when the "Stop" (or "Kill") button is pressed.
+     * @author Adel Wehbi
+     * @return {[type]} [description]
+     */
+    function onKill(callback){
+        killCallback    = callback;
     }
 
     /**
@@ -155,6 +184,13 @@ define(function(require, exports, module) {
         }
     }
 
+    /**
+     * Clears content of console, including input text.
+     * @author Adel Wehbi
+     */
+    function clear(){
+        _$output.html('');
+    }
 
     /**
      * Logs to console. That includes a timestamp and a new line after the text.
@@ -198,9 +234,11 @@ define(function(require, exports, module) {
 
     //expose these functions
     exports.onInput = onInput;
-    exports.show = show;
-    exports.hide = hide;
-    exports.log = log;
-    exports.output = output;
-    exports.error = error;
+    exports.onKill  = onKill;
+    exports.show    = show;
+    exports.hide    = hide;
+    exports.clear   = clear;
+    exports.log     = log;
+    exports.output  = output;
+    exports.error   = error;
 });

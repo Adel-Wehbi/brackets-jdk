@@ -50,7 +50,7 @@
     function run(directory, className) {
         //if there is already a process running, send it a SIGINT (equivalent to control-c)
         if (currentProcess != undefined) {
-            currentProcess.kill("SIGINT");
+            killProcess();
             //wait for process death before running again, just in case something's off
             currentProcess.on("exit", function(code, signal) {
                 run(directory, className);
@@ -101,12 +101,22 @@
      * @param {string} input The text to write to the input stream.
      */
     function writeToStdin(input) {
-        if (currentProcess == undefined)
+        if(currentProcess == undefined)
             return;
 
         currentProcess.stdin.write(input);
     }
 
+    /**
+     * Sends the process a SIGINT signal.
+     * @author Adel Wehbi
+     */
+    function killProcess(){
+        if(currentProcess == undefined)
+            return;
+
+        currentProcess.kill("SIGINT");
+    }
 
     /**
      * Initialize the bracketsjdk NodeDomain, expose its functions to the webkit end, and register its events.
@@ -180,6 +190,15 @@
                 type: "string",
                 description: "The text to write to Stdin."
             }]
+        );
+
+        //expose the killProcess function to the webkit end
+        domainManager.registerCommand(
+            "bracketsjdk",
+            "killProcess",
+            killProcess,
+            false,
+            "Sends the currently running Java process a SIGINT"
         );
 
         //register a log event

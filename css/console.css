@@ -1,3 +1,35 @@
+.bracketsjdk .clear{
+    position: absolute;
+    color: inherit;
+    right: 30px;
+    margin-top: -10px;
+    top: 50%;
+    opacity: 0.6;
+}
+
+.bracketsjdk .clear:hover{
+    text-decoration: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: 1;
+}
+
+.bracketsjdk .kill{
+    position: absolute;
+    color: inherit;
+    right: 70px;
+    margin-top: -10px;
+    top: 50%;
+    opacity: 0.6;
+}
+
+.bracketsjdk .kill:hover{
+    text-decoration: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: 1;
+}
+
 .bracketsjdk #content-wrapper{
 	padding: 10px;
 	overflow-y: auto;
@@ -7,9 +39,9 @@
 
 .bracketsjdk pre{
 	display: inline;
-	font-family: inherit; 
-	background-color: inherit; 
-	border-style: none; 
+	font-family: inherit;
+	background-color: inherit;
+	border-style: none;
 	color: inherit;
 	padding: 0;
 	font-size: 1.5em;

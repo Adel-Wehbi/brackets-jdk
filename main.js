@@ -43,6 +43,10 @@ define(function(require, exports, module){
             writeToStdin(input);
         });
 
+        //listen to kill commands from the console
+        console.onKill(function(){
+            killProcess();
+        });
         //***********************COMMANDS*************************//
         //register the command for "Build Project"
         var buildProjectCommand            = CommandManager.register(
@@ -177,6 +181,13 @@ define(function(require, exports, module){
         bracketsjdk.exec("writeToStdin", input);
     }
 
+    /**
+     * Asks backend to kill the process.
+     * @author Adel Wehbi
+     */
+    function killProcess(){
+        bracketsjdk.exec("killProcess");
+    }
 
     /**
      * Finds the Java project path based on the currently viewed file.
