@@ -1,11 +1,10 @@
 (function() {
     "use strict";
 
-    //cross-platform shell access
-    var shell = require("shelljs");
+    var os      = require('os');
+    var shell   = require("shelljs");
     var _domainManager;
     var currentProcess;
-
 
     /**
      * Compiles an array of java files. Emits an error event in case compilation fails.
@@ -115,7 +114,11 @@
         if(currentProcess == undefined)
             return;
 
-        currentProcess.kill("SIGINT");
+        if(os.platform == "win32")
+            child_process.exec('taskkill /pid ' + currentProcess.pid + ' /T /F');
+        else
+            currentProcess.kill("SIGINT");
+
     }
 
     /**
