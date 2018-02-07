@@ -102,6 +102,11 @@ define(function(require, exports, module) {
         });
     };
 
+    /**
+     * Scrolls to bottom of console when new content is printed out.
+     * @author Adel Wehbi
+     * @private
+     */
     function _scrollToBottom() {
         _$contentWrapper.scrollTop(_$contentWrapper[0].scrollHeight);
     }
@@ -156,6 +161,15 @@ define(function(require, exports, module) {
      */
     function onKill(callback){
         killCallback    = callback;
+    }
+
+    /**
+     * Returns a boolean to indicate if the console is currently shown or not
+     * @author Adel Wehbi
+     * @return {Boolean} The visibility state of the console.
+     */
+    function isVisible() {
+        return _visible;
     }
 
     /**
@@ -233,12 +247,13 @@ define(function(require, exports, module) {
     _init();
 
     //expose these functions
-    exports.onInput = onInput;
-    exports.onKill  = onKill;
-    exports.show    = show;
-    exports.hide    = hide;
-    exports.clear   = clear;
-    exports.log     = log;
-    exports.output  = output;
-    exports.error   = error;
+    exports.onInput     = onInput;
+    exports.onKill      = onKill;
+    exports.isVisible   = isVisible;
+    exports.show        = show;
+    exports.hide        = hide;
+    exports.clear       = clear;
+    exports.log         = log;
+    exports.output      = output;
+    exports.error       = error;
 });

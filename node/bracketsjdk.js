@@ -57,8 +57,6 @@
             return;
         }
 
-        //TODO if SIGINT does not kill the process, send a SIGTERM
-
         //change directory to that of the class to execute
         shell.cd(directory);
 
@@ -114,10 +112,14 @@
         if(currentProcess == undefined)
             return;
 
+        _domainManager.emitEvent("bracketsjdk", "output", "\n");
+
         if(os.platform == "win32")
             child_process.exec('taskkill /pid ' + currentProcess.pid + ' /T /F');
         else
             currentProcess.kill("SIGINT");
+
+        //TODO if SIGINT does not kill the process, send a SIGTERM
 
     }
 

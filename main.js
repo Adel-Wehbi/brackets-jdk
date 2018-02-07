@@ -101,6 +101,17 @@ define(function(require, exports, module){
             }
         );
 
+        //register the command for the "Toggle Console"
+        var toggleConsoleCommand        = CommandManager.register(
+            "Toggle Java Console",
+            "bracketsjdk.toggleConsoleCommand",
+            function(){
+                if(console.isVisible())
+                    console.hide();
+                else
+                    console.show();
+            }
+        );
 
         //*******************EDIT MENU***************************//
         //add 2 menu options in the Edit tab for these three commands
@@ -112,14 +123,16 @@ define(function(require, exports, module){
         editMenu.addMenuItem("bracketsjdk.buildProjectCommand");
         editMenu.addMenuItem("bracketsjdk.runProjectCommand");
         editMenu.addMenuItem("bracketsjdk.buildAndRunProjectCommand");
+        editMenu.addMenuItem("bracketsjdk.toggleConsoleCommand");
         //add divider after too
         editMenu.addMenuDivider();
 
 
         //********************KEYBOARD SHORTCUTS*****************//
-        //bind keyboard shortcuts for both commands too
-        KeyBindingManager.addBinding(buildProjectCommand, "Shift-F6");
+        //bind keyboard shortcuts for commands
+        KeyBindingManager.addBinding(buildProjectCommand,       "Shift-F6");
         KeyBindingManager.addBinding(buildAndRunProjectCommand, "Ctrl-Shift-F6");
+        KeyBindingManager.addBinding(toggleConsoleCommand,      "Ctrl-Alt-J");
     }
 
     /**
