@@ -21,13 +21,9 @@ Java Project are considered to be the folders present <b>on</b> Bracket's Projec
 So for example, say you want to create two java projects, you create two new folders on the Bracket's
 Project Root called "JavaProject1" and "JavaProject2". In the future, this will be a preference option.
 
-</br>
-
 <i>Which</i> java project to compile is determined by the currently viewed file. In our example, if
 you're currently viewing a file "main.java" located immediately in the "JavaProject1" directory
 and you use the Compile command, then "JavaProject1" will be compiled.
-
-</br>
 
 Compiled files are placed in the directory bin/ inside the project. If that directory does not exist,
 it will be created. This directory is emptied before each compilation. In the future, the location of this directory
@@ -35,8 +31,6 @@ will be a preference choice.
 
 When using th Run command, the extension itself finds the class that contains the main method
 using the regex "public\s+static\s+void\s+main" and runs that class.
-
-</br>
 
 Currently, this extension only supports <b>one</b> point of entry to any java project. If you have
 several main methods in your app, the first class found to have that method will be run.
