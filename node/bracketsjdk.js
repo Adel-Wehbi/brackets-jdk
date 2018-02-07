@@ -114,8 +114,8 @@
 
         _domainManager.emitEvent("bracketsjdk", "output", "\n");
 
-        if(os.platform == "win32")
-            child_process.exec('taskkill /pid ' + currentProcess.pid + ' /T /F');
+        if(os.platform() == "win32")
+            shell.exec('taskkill /pid ' + currentProcess.pid + ' /T /F');
         else
             currentProcess.kill("SIGINT");
 

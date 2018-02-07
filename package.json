@@ -3,7 +3,7 @@
     "title": "Brackets JDK",
     "description": "Integration for Java Development Kit. Compiles and Runs. Includes its own Java Console.",
     "homepage": "https://github.com/Adel-Wehbi/brackets-jdk",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Adel Wehbi <adelwehbi@gmail.com> (http://www.adelwehbi.com)",
     "engines": {
         "brackets": ">=0.24.0"
