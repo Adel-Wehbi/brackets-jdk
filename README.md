@@ -11,10 +11,10 @@ Integration for Java Development Kit. Compiles and Runs. Includes its own Java C
 ## Usage
 The Extension adds 4 commands to the Edit Menu in the Menu Bar:
 <ul>
-    <li>    Build Java Project Shortcut: Shift-F6       </li>
-    <li>    Run Java Project Shortcut: None             </li>
-    <li>    Build and Run Java Project: Ctrl-Shift-F6   </li>
-    <li>    Toggle Java Console                         </li>
+    <li>    Build Java Project (Shortcut: Shift-F6)                 </li>
+    <li>    Run Java Project (Shortcut: None)                       </li>
+    <li>    Build and Run Java Project (Shortcut: Ctrl-Shift-F6)    </li>
+    <li>    Toggle Java Console (Shortcut: Ctrl-Alt-J)              </li>
 </ul>
 
 Java Project are considered to be the folders present <b>on</b> Bracket's Project Root.
