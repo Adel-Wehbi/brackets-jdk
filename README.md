@@ -42,7 +42,7 @@ If you'd like a specific feature added to this list, file an issue! Here's the T
 (There's no order of priority):
 <ul>
     <li>
-        Remove the Shelljs dependency as it turned out it isn't very necessary. (Phasing its use out should be easy)
+        Remove the Shelljs dependency as it turned out it isn't very necessary. (Phasing its use out should be easy). STATUS: ONGOING.
     </li>
     <li>
         Support setting preferences such as whether to have the entire workspace be one Java project,
