@@ -3,24 +3,22 @@
 Integration for Java Development Kit. Compiles and Runs. Includes its own Java Console.
 
 ## Dependencies
-<ul>
-      <li>  Java Development Kit (java and javac commands should run correctly from the Command Prompt or Terminal) </li>
-</ul>
+* Java Development Kit (java and javac commands should run correctly from the Command Prompt or Terminal)
 
 ## Usage
 The Extension adds 4 commands to the Edit Menu in the Menu Bar:
-<ul>
-    <li>    Build Java Project (Shortcut: Shift-F6)                 </li>
-    <li>    Run Java Project (Shortcut: None)                       </li>
-    <li>    Build and Run Java Project (Shortcut: Ctrl-Shift-F6)    </li>
-    <li>    Toggle Java Console (Shortcut: Ctrl-Alt-J)              </li>
-</ul>
 
-Java Project are considered to be the folders present <b>on</b> Bracket's Project Root.
+* Build Java Project (Shortcut: Shift-F6)             
+* Run Java Project (Shortcut: None)                   
+* Build and Run Java Project (Shortcut: Ctrl-Shift-F6)
+* Toggle Java Console (Shortcut: Ctrl-Alt-J)          
+
+
+Java Project are considered to be the folders present **on** Bracket's Project Root.
 So for example, say you want to create two Java projects, you create two new folders on the Bracket's
 Project Root called "JavaProject1" and "JavaProject2". In the future, this will be a preference option.
 
-<i>Which</i> java project to compile is determined by the currently viewed file. In our example, if
+_Which_ java project to compile is determined by the currently viewed file. In our example, if
 you're currently viewing a file ```main.java``` located immediately in the "JavaProject1" directory
 and you use the Compile command, then "JavaProject1" will be compiled.
 
@@ -39,27 +37,14 @@ I intend to work on these features later on. However, if you would like to contr
 Do make me aware that you've adopted a feature from the TODO list so I don't start from scratch on it.
 If you'd like a specific feature added to this list, file an issue! Here's the TODO list
 (There's no order of priority):
-<ul>
-    <li>
-        Remove the Shelljs dependency as it turned out it isn't very necessary. (Phasing its use out should be easy). STATUS: COMPLETED.
-    </li>
-    <li>
-        Support setting preferences such as whether to have the entire workspace be one Java project,
-        the location of the build directory...
-    </li>
-    <li>
-        Support multiple project entry points (multiple main methods).
-    </li>
-    <li>
-        Autocomplete support for Java.
-    </li>
-    <li>
-        Java linting and error detection.
-    </li>
-    <li>
-        Support displaying Java documentation (including for user created functions).
-    </li>
-</ul>
+* Remove the Shelljs dependency as it turned out it isn't very necessary. (Phasing its use out should be easy).
+    STATUS: COMPLETED.
+* Support setting preferences such as whether to have the entire workspace be one Java project,
+    the location of the build director
+* Support multiple project entry points (multiple main methods).
+* Autocomplete support for Java.
+* Java linting and error detection.
+* Support displaying Java documentation (including for user created functions).
 
 ## Contribute
 Contributing to this project should be fairly easy. There are a few things to keep in mind though.
@@ -71,4 +56,4 @@ If you want to send something from the Nodejs side to the node-webkit side, howe
 function (see ```bracketsjdk.js``` for an example).
 
 For a clearer explanation on how that works, consult the
-<a href="https://github.com/adobe/brackets/wiki/Brackets-Node-Process:-Overview-for-Developers">Brackets Node Process: Overview for Developers</a>.
+[Brackets Node Process: Overview for Developers](https://github.com/adobe/brackets/wiki/Brackets-Node-Process:-Overview-for-Developers).
