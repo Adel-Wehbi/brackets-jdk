@@ -43,10 +43,17 @@
      * @param   {string} dir The directory path to create.
      */
     function createDir(dir){
-        if(os.platform() == "win32")
-            child_process.execSync("md \"" + dir + "\"");
-        else
-            child_process.execSync("mkdir -p \"" + dir + "\"");
+        if(os.platform() == "win32"){
+            //try catch is necessary, because an error will occur if dir already exists
+            try{
+                child_process.execSync("md \"" + dir + "\"");
+            }catch(error){}
+        }else{
+            //same here
+            try{
+                child_process.execSync("mkdir -p \"" + dir + "\"");
+            }catch(error){}
+        }
     }
 
     /**
@@ -55,9 +62,14 @@
      * @param   {string} dir Directory including the trailing slash.
      */
     function emptyDir(dir){
-        if(os.platform() == "win32")
-            child_process.execSync("rmdir /S \"" + dir + "\"");
+        if(os.platform() == "win32"){
+            //try-catch is necessary else execution will be blocked if there's an error
+            try{
+                child_process.execSync("rmdir /S \"" + dir + "\"");
+            }catch(error){}
+        }
         else
+            //does not give an error if directory is empty, so try-catch might not be necessary
             child_process.execSync("rm -rf \"" + dir + "\"*");
     }
 
