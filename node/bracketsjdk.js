@@ -1,8 +1,9 @@
 (function() {
     "use strict";
 
-    var os      = require('os');
-    var shell   = require("shelljs");
+    var os              = require('os');
+    var child_process   = require("child_process");
+
     var _domainManager;
     var currentProcess;
 
@@ -18,27 +19,47 @@
             return false;
 
         //create the bin location if it does not already exist
-        shell.mkdir("-p", outputPath);
+        createDir(outputPath);
 
-        //empty it (in case file names were changed)
-        shell.rm("-rf", outputPath + "*");
+        //empty it (in case file names have changed)
+        emptyDir(outputPath);
 
         _domainManager.emitEvent("bracketsjdk", "log", "Compiling...");
 
         //compile using the command javac filePath1 filePath2... -d outputPath
-        var result = shell.exec("javac \"" + filePaths.join("\" \"") + "\" -d \"" + outputPath + "\"");
-
-        if (result.stderr) {
-            _domainManager.emitEvent("bracketsjdk", "error", result.stderr);
+        try{
+            child_process.execSync("javac \"" + filePaths.join("\" \"") + "\" -d \"" + outputPath + "\"");
+            _domainManager.emitEvent("bracketsjdk", "log", "Done.");
+            return true;
+        }catch(error){
+            _domainManager.emitEvent("bracketsjdk", "error", error.stderr.toString());
             return false;
         }
-
-        _domainManager.emitEvent("bracketsjdk", "log", "Done.");
-
-        return true;
-
     }
 
+    /**
+     * Creates a directory.
+     * @author Adel Wehbi
+     * @param   {string} dir The directory path to create.
+     */
+    function createDir(dir){
+        if(os.platform() == "win32")
+            child_process.execSync("md \"" + dir + "\"");
+        else
+            child_process.execSync("mkdir -p \"" + dir + "\"");
+    }
+
+    /**
+     * Deletes the contents of a directory without deleting the directory itself.
+     * @author Adel Wehbi
+     * @param   {string} dir Directory including the trailing slash.
+     */
+    function emptyDir(dir){
+        if(os.platform() == "win32")
+            child_process.execSync("rmdir /S \"" + dir + "\"");
+        else
+            child_process.execSync("rm -rf \"" + dir + "\"*");
+    }
 
     /**
      * Runs a java class. If there is already a class running by us, we kill its process.
@@ -57,15 +78,14 @@
             return;
         }
 
-        //change directory to that of the class to execute
-        shell.cd(directory);
 
         _domainManager.emitEvent("bracketsjdk", "log", "Running class " + className + "...")
 
         //start the new process
-        var process = shell.exec("java " + className, {
-            async: true
-        });
+        var process = child_process.exec(
+            "java " + className,
+            {cwd: directory}
+        );
 
         //listener for output on process stdout
         process.stdout.on("data", function(data) {
@@ -115,7 +135,7 @@
         _domainManager.emitEvent("bracketsjdk", "output", "\n");
 
         if(os.platform() == "win32")
-            shell.exec('taskkill /pid ' + currentProcess.pid + ' /T /F');
+            child_process.exec('taskkill /pid ' + currentProcess.pid + ' /T /F');
         else
             currentProcess.kill("SIGINT");
 

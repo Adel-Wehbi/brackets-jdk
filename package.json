@@ -8,11 +8,22 @@
     "engines": {
         "brackets": ">=0.24.0"
     },
-    "i18n": [ "en", "fr"],
+    "i18n": [
+        "en",
+        "fr"
+    ],
     "package-i18n": {
         "fr": {
             "description": "Intégration pour le JDK. Compile et éxecute. Un Java Console est inclus."
         }
     },
-    "keywords": ["jdk", "java", ".java", "compile", "run", "console"]
+    "keywords": [
+        "jdk",
+        "java",
+        ".java",
+        "compile",
+        "run",
+        "console"
+    ],
+    "dependencies": {}
 }
