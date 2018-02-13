@@ -65,7 +65,7 @@
         if(os.platform() == "win32"){
             //try-catch is necessary else execution will be blocked if there's an error
             try{
-                child_process.execSync("rmdir /S \"" + dir + "\"");
+                child_process.execSync("rmdir /S /Q \"" + dir + "\"", {cwd: dir});
             }catch(error){}
         }
         else
