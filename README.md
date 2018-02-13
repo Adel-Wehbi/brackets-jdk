@@ -4,7 +4,6 @@ Integration for Java Development Kit. Compiles and Runs. Includes its own Java C
 
 ## Dependencies
 <ul>
-      <li>  <a href="https://github.com/shelljs/shelljs">Shelljs</a> (will be phased out in the future)             </li>
       <li>  Java Development Kit (java and javac commands should run correctly from the Command Prompt or Terminal) </li>
 </ul>
 
@@ -22,7 +21,7 @@ So for example, say you want to create two Java projects, you create two new fol
 Project Root called "JavaProject1" and "JavaProject2". In the future, this will be a preference option.
 
 <i>Which</i> java project to compile is determined by the currently viewed file. In our example, if
-you're currently viewing a file ```main.java"``` located immediately in the "JavaProject1" directory
+you're currently viewing a file ```main.java``` located immediately in the "JavaProject1" directory
 and you use the Compile command, then "JavaProject1" will be compiled.
 
 Compiled files are placed in the directory ```bin/``` inside the project. If that directory does not exist,
@@ -42,7 +41,7 @@ If you'd like a specific feature added to this list, file an issue! Here's the T
 (There's no order of priority):
 <ul>
     <li>
-        Remove the Shelljs dependency as it turned out it isn't very necessary. (Phasing its use out should be easy). STATUS: ONGOING.
+        Remove the Shelljs dependency as it turned out it isn't very necessary. (Phasing its use out should be easy). STATUS: COMPLETED.
     </li>
     <li>
         Support setting preferences such as whether to have the entire workspace be one Java project,

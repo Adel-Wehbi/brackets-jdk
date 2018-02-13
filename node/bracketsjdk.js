@@ -171,7 +171,7 @@
         }
 
         //expose the compileFile function to the webkit end
-        domainManager.registerCommand(
+        _domainManager.registerCommand(
             "bracketsjdk",
             "compileFiles",
             compileFiles,
@@ -194,7 +194,7 @@
         );
 
         //expose the run function to the webkit end
-        domainManager.registerCommand(
+        _domainManager.registerCommand(
             "bracketsjdk",
             "run",
             run,
@@ -217,7 +217,7 @@
         );
 
         //expose the writeToProcess function to the webkit end
-        domainManager.registerCommand(
+        _domainManager.registerCommand(
             "bracketsjdk",
             "writeToStdin",
             writeToStdin,
@@ -230,7 +230,7 @@
         );
 
         //expose the killProcess function to the webkit end
-        domainManager.registerCommand(
+        _domainManager.registerCommand(
             "bracketsjdk",
             "killProcess",
             killProcess,
@@ -249,7 +249,7 @@
         );
 
         //register an stdout event
-        domainManager.registerEvent(
+        _domainManager.registerEvent(
             "bracketsjdk",
             "output", [{
                 name: "ouputText",
@@ -259,7 +259,7 @@
         );
 
         //register an stderr event
-        domainManager.registerEvent(
+        _domainManager.registerEvent(
             "bracketsjdk",
             "error", [{
                 name: "errorText",
